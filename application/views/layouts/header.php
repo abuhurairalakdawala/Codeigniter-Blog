@@ -15,8 +15,19 @@
     <div class="container-fluid">
       <div class="collapse navbar-collapse">
         <ul class="nav navbar-nav">
-        <li><a class="pmd-ripple-effect" href="<?=base_url('blog/show')?>">Blogs List</a></li>
-        <li><a class="pmd-ripple-effect" href="<?=base_url('blog/add')?>">Add Blog</a></li>
+          <li><a class="pmd-ripple-effect" href="<?=base_url('blog/show')?>">Blogs List</a></li>
+          <li><a class="pmd-ripple-effect" href="<?=base_url('blog/add')?>">Add Blog</a></li>
+          <?php
+            if(isLoggedIn()):
+          ?>
+          <li><a class="pmd-ripple-effect" href="<?=base_url('login/destroy')?>">Logout</a></li>
+          <?php
+            else:
+          ?>
+          <li><a class="pmd-ripple-effect" href="<?=base_url('login')?>">Login</a></li>
+          <?php
+            endif;
+          ?>
         </ul>
       </div>
     </div>

@@ -14,11 +14,17 @@ class BlogModel extends CI_Model
 
 	public function getAll()
 	{
-		return $this->db->get('blogs');
+		return $this->db->order_by('id DESC')->get('blogs');
 	}
 
 	public function getOne($id)
 	{
 		return $this->db->where(['id' => $id])->limit(1)->get('blogs');
 	}
+
+	public function delete($id)
+	{
+		return $this->db->where(['id' => $id])->limit(1)->delete('blogs');
+	}
+
 }

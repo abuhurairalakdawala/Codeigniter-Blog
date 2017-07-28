@@ -14,6 +14,14 @@ class Blog extends CI_Controller
 
 	public function save()
 	{
+		if(!isLoggedIn()){
+			echo json_encode(['error' => ['base-err' => 'Please Login To Add Blog!']]);
+			return;
+		}
+		if(!canManageBlog()){
+			echo json_encode(['error' => ['base-err' => 'You dont have permission to add blog!']]);
+			return;
+		}
 		$this->load->library('form_validation');
 		$this->form_validation->set_rules('blog-title', 'Blog Title', 'trim|required|max_length[150]');
 		$this->form_validation->set_rules('editor', 'Blog Content', 'trim|required');
@@ -29,6 +37,7 @@ class Blog extends CI_Controller
 				'blog_title' => $this->input->post('blog-title'),
 				'blog_content' => $this->input->post('editor'),
 				'blog_banner' => $this->upload->data('file_name'),
+				'user_id' => $this->session->user_id,
 				'created_at' => date('Y-m-d H:i:s')
 			]);
 			if($insert === true){
@@ -44,6 +53,7 @@ class Blog extends CI_Controller
 
 	public function show()
 	{
+		$this->js = '<script type="text/javascript" src="'.base_url('assets/js/delete-blog.js').'"></script>';
 		$this->load->model('blogModel');
 		$blogs = $this->blogModel->getAll();
 		$this->load->view('layouts/header');
@@ -64,6 +74,40 @@ class Blog extends CI_Controller
 		$this->load->view('layouts/header');
 		$this->load->view('blog/item', ['blog' => $blog->row()]);
 		$this->load->view('layouts/footer');
+	}
+
+	public function delete($id=0)
+	{
+		if(!ctype_digit($id)){
+			echo json_encode(['error' => 'Invalid Blog!']);
+			return;
+		}
+		if(!isLoggedIn()){
+			echo json_encode(['error' => 'Please Login!']);
+			return;
+		}
+		if(!canManageBlog()){
+			echo json_encode(['error' => 'You dont have permission!']);
+			return;
+		}
+		$this->load->model('blogModel');
+		if(isAdmin()){
+			$this->blogModel->delete($id);
+			echo json_encode(['success' => true]);
+			return;
+		}
+		$blog = $this->blogModel->getOne($id);
+		if($blog->num_rows() == 1){
+			$blog = $blog->row();
+			if($blog->user_id != $this->session->user_id){
+				echo json_encode(['error' => 'You dont have permission!']);
+				return;
+			}
+			$this->blogModel->delete($id);
+			echo json_encode(['success' => true]);
+			return;
+		}
+		echo json_encode(['error' => 'Invalid Blog!']);
 	}
 
 }
