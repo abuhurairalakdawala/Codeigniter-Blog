@@ -32,4 +32,9 @@ class BlogModel extends CI_Model
 		return $this->db->order_by('id DESC')->like('blog_title', $query)->get('blogs');
 	}
 
+	public function saveOne(array $data, $id)
+	{
+		return $this->db->where('id', $id)->limit(1)->update('blogs', $data);
+	}
+
 }

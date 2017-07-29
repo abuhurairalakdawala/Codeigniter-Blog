@@ -2,8 +2,8 @@
   <div class="row">
     <div class="col-sm-12">
     <div class="pmd-card">
-      <?=form_open_multipart(base_url('blog/save'), 'class="pmd-card-body" id="new-blog-form"')?>
-          <h2 class="pmd-card-title-text">Add Blog</h2>
+      <?=form_open_multipart(base_url('blog/save_edit/'.$blog->id), 'class="pmd-card-body" id="new-blog-form"')?>
+          <h2 class="pmd-card-title-text">Edit Blog</h2>
           <hr>
           <?=$this->session->flashdata('blogAddOk')?>
           <div class="form-group">
@@ -14,12 +14,12 @@
           <div class="form-group">
             <label for="blog-banner" class="control-label">Blog Banner</label>
             <input type="file" id="blog-banner" name="file" accept=".jpg,.png,.jpeg">
+            <img src="<?=base_url('assets/images/blogs/'.$blog->blog_banner)?>" width="100" style="margin-top:10px" class="pmd-z-depth">
             <?=errorMessage('file-err')?>
           </div>
           <div class="form-group">
             <label for="editor" class="control-label">Blog Content</label>
             <textarea name="editor" id="editor"><?=$blog->blog_content?></textarea>
-            <?=$blog->blog_content?>
             <?=errorMessage('editor-err')?>
           </div>
           <div class="form-group">

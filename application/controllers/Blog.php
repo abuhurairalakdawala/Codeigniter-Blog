@@ -3,6 +3,7 @@
 class Blog extends CI_Controller
 {
 	public $js;
+		// $this->output->enable_profiler(true);
 
 	public function add()
 	{
@@ -126,9 +127,66 @@ class Blog extends CI_Controller
 		$this->load->view('layouts/footer');
 	}
 
+	public function save_edit($id = 0)
+	{
+		if(!ctype_digit($id)){
+			echo json_encode(['error' => ['base-err' => 'Invalid Blog!']]);
+			return;
+		}
+		if(!isLoggedIn()){
+			echo json_encode(['error' => ['base-err' => 'Please Login To Edit Blog!']]);
+			return;
+		}
+		if(!canManageBlog()){
+			echo json_encode(['error' => ['base-err' => 'You dont have permission to add blog!']]);
+			return;
+		}
+		$this->load->model('blogModel');
+		$blog = $this->blogModel->getOne($id);
+		if($blog->num_rows() == 0){
+			echo json_encode(['error' => ['base-err' => 'Invalid blog!']]);
+			return;
+		}
+		$blog = $blog->row();
+		if($blog->user_id != $this->session->user_id){
+			echo json_encode(['error' => ['base-err' => 'This blog does not belong to you!']]);
+			return;
+		}
+		$this->load->library('form_validation');
+		$this->form_validation->set_rules('blog-title', 'Blog Title', 'trim|required|max_length[150]');
+		$this->form_validation->set_rules('editor', 'Blog Content', 'trim|required');
+		if ($this->form_validation->run())
+		{
+			$fileName = '';
+			if(isset($_FILES['file']) && !empty($_FILES['file']['name'])){
+				$this->load->library('upload', ['allowed_types' => 'jpg|png|jpeg', 'upload_path' => 'assets/images/blogs', 'encrypt_name' => true]);
+				if(!$this->upload->do_upload('file')){
+					echo json_encode(['error' => ['file-err' => $this->upload->display_errors('','')]]);
+					return;
+				}
+				$fileName = $this->upload->data('file_name');
+			}
+			$data = [
+				'blog_title' => $this->input->post('blog-title'),
+				'blog_content' => $this->input->post('editor')
+			];
+			if(!empty($fileName)){
+				$data['blog_banner'] = $fileName;
+			}
+			$update = $this->blogModel->saveOne($data, $id);
+			if($update === true){
+				$this->session->set_flashdata('blogAddOk', successMessage('Changes Saved Successfully!'));
+				echo json_encode(['success'=>true]);
+				return;
+			}
+			echo json_encode(['error' => ['base-err' => 'Somehting went wrong! Please try again!']]);
+			return;
+		}
+		echo json_encode(['error' => ['title-err'=>form_error('blog-title'),'editor-err'=>form_error('editor')]]);
+	}
+
 	public function search()
 	{
-		// $this->output->enable_profiler(true);
 		$this->load->model('blogModel');
 		$blogs = $this->blogModel->search($this->input->get('query'));
 		$this->load->view('layouts/header');

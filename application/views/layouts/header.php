@@ -21,6 +21,7 @@
             if(isLoggedIn()):
           ?>
           <li><a class="pmd-ripple-effect" href="<?=base_url('login/destroy')?>">Logout</a></li>
+          <li><a class="pmd-ripple-effect" href="#">@<?=$this->session->username?></a></li>
           <?php
             else:
           ?>
