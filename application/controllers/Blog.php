@@ -3,7 +3,7 @@
 class Blog extends CI_Controller
 {
 	public $js;
-		// $this->output->enable_profiler(true);
+	// $this->output->enable_profiler(true);
 
 	public function add()
 	{
@@ -72,8 +72,10 @@ class Blog extends CI_Controller
 		if($blog->num_rows() === 0){
 			show_404();
 		}
+		$this->js = '<script type="text/javascript" src="'.base_url('assets/js/blog-item.js').'"></script>';
+		$comments = $this->blogModel->getItemComments($id);
 		$this->load->view('layouts/header');
-		$this->load->view('blog/item', ['blog' => $blog->row()]);
+		$this->load->view('blog/item', ['blog' => $blog->row(), 'comments' => $comments->result()]);
 		$this->load->view('layouts/footer');
 	}
 
@@ -192,6 +194,37 @@ class Blog extends CI_Controller
 		$this->load->view('layouts/header');
 		$this->load->view('blog/search', ['blogs' => $blogs->result()]);
 		$this->load->view('layouts/footer');
+	}
+
+	public function add_comment($id)
+	{
+		if(!ctype_digit($id)){
+			echo json_encode(['error' => 'Invalid Blog!']);
+			return;
+		}
+		if(!isLoggedIn()){
+			echo json_encode(['error' => 'Please Login To Comment!']);
+			return;
+		}
+		$this->load->library('form_validation');
+		$this->form_validation->set_rules('comment_text', 'Comment', 'trim|required|max_length[2000]');
+		if ($this->form_validation->run()){
+			$this->load->model('blogModel');
+			$blog = $this->blogModel->getOne($id);
+			if($blog->num_rows() == 0){
+				echo json_encode(['error' => 'Invalid Blog. Please refresh the page and try again!']);
+				return;
+			}
+			$this->load->model('commentModel');
+			$insert = $this->commentModel->add(['comments'=>$this->input->post('comment_text'), 'user_id' => $this->session->user_id, 'blog_id' => $id]);
+			if($insert){
+				echo json_encode(['success'=>true]);
+				return;
+			}
+			echo json_encode(['error'=>'Somehting went wrong! Please try again!']);
+			return;
+		}
+		echo json_encode(['error' => form_error('comment_text')]);
 	}
 
 }

@@ -37,4 +37,9 @@ class BlogModel extends CI_Model
 		return $this->db->where('id', $id)->limit(1)->update('blogs', $data);
 	}
 
+	public function getItemComments($id)
+	{
+		return $this->db->where('blog_id', $id)->order_by('comments.id DESC')->join('users', 'users.id=comments.user_id', 'inner')->select('comments.id,user_id,username,comments')->get('comments');
+	}
+
 }
