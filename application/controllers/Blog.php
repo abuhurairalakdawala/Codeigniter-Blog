@@ -110,4 +110,30 @@ class Blog extends CI_Controller
 		echo json_encode(['error' => 'Invalid Blog!']);
 	}
 
+	public function edit($id=0)
+	{
+		if(!ctype_digit($id)){
+			show_404();
+		}
+		$this->load->model('blogModel');
+		$blog = $this->blogModel->getOne($id);
+		if($blog->num_rows() == 0){
+			show_404();
+		}
+		$this->js = '<script type="text/javascript" src="'.base_url('assets/js/add-blog.js').'"></script>';
+		$this->load->view('layouts/header');
+		$this->load->view('blog/edit', ['blog' => $blog->row()]);
+		$this->load->view('layouts/footer');
+	}
+
+	public function search()
+	{
+		// $this->output->enable_profiler(true);
+		$this->load->model('blogModel');
+		$blogs = $this->blogModel->search($this->input->get('query'));
+		$this->load->view('layouts/header');
+		$this->load->view('blog/search', ['blogs' => $blogs->result()]);
+		$this->load->view('layouts/footer');
+	}
+
 }

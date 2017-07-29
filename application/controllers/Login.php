@@ -30,9 +30,7 @@ class Login extends CI_Controller
 
 	public function destroy()
 	{
-		$this->session->user_id = null;
-		$this->session->role_id = null;
-		$this->session->username = null;
+		$this->session->sess_destroy();
 		redirect('login');
 	}
 				// $salt = md5(time().	'dfdsfdsfsa56df4sed5f4sd5');

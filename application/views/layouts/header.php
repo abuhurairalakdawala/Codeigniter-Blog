@@ -29,6 +29,11 @@
             endif;
           ?>
         </ul>
+        <form action="<?=base_url('blog/search')?>" method="get" class="navbar-form navbar-left">
+          <div class="form-group">
+            <input type="text" class="form-control" name="query" placeholder="Search Blogs" autocomplete="off">
+          </div>
+        </form>
       </div>
     </div>
   </nav>

@@ -22,7 +22,7 @@ function strip_blog_list($text)
 
 function strip_blog_item($text)
 {
-	return strip_tags($text, '<p><a><blockquote><b><strong><u></i><sub><sup><s><img><h1><h2><h3><h4><h5><h6><pre><div><span><address>');
+	return strip_tags($text, '<p><a><blockquote><b><strong><u></i><sub><sup><s><img><h1><h2><h3><h4><h5><h6><pre><div><span><address><ul><li><ol>');
 }
 
 function isLoggedIn()

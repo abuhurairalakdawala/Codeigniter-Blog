@@ -27,4 +27,9 @@ class BlogModel extends CI_Model
 		return $this->db->where(['id' => $id])->limit(1)->delete('blogs');
 	}
 
+	public function search($query)
+	{
+		return $this->db->order_by('id DESC')->like('blog_title', $query)->get('blogs');
+	}
+
 }
